@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 
 const cartSchema = new mongoose.Schema({
     userId:{
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     foods: [
         {
             foodId: {
-                type: mongoose.Types.ObjectId,
+                type: mongoose.Schema.Types.ObjectId,
                 ref: 'Foods',
                 required: true
             },
@@ -17,11 +17,6 @@ const cartSchema = new mongoose.Schema({
                 type: Number,
                 required: true
             },
-            quantity: {
-                type:Number,
-                required:true,
-                default: 0
-            }
         }
     ],
     totalPrice: {
@@ -29,10 +24,11 @@ const cartSchema = new mongoose.Schema({
         required: true,
         default: 0
     }
-})
+});
 
-cartSchema.method.calculateTotalPrice = function () {
-    this.totalPrice = this.foods.reduce((total, food)=> total + food.price, 0)
+
+cartSchema.methods.calculateTotalPrice = function () {
+   return this.totalPrice = this.foods.reduce((total, food) => total + food.price, 0)
 }
 
 const Cart = new mongoose.model("Cart",cartSchema)

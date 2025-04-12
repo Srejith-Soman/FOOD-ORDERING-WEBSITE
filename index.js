@@ -24,6 +24,10 @@ app.use("/user",userRouter)
 app.use("/food",foodRouter)
 app.use('/cart',cartRouter)
 
+app.all("*",(req, res, next)=> {
+    res.status(404).json({ message: "emdpoint dose not exist "})
+})
+
 app.listen(process.env.PORT ,()=>{
     console.log(`Server Start on Port ${process.env.PORT} `);
     

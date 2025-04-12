@@ -1,9 +1,9 @@
-import Cart from "../models/cartModel.js";
+import Cart from '../models/cartModel.js'
 import Foods from "../models/foodModel.js";
 
 export const addFoodToCart = async (req, res) => {
     try {
-        const userId = req.user.id
+        const userId = req.user
         const { foodId } = req.body
 
         //find the food to ensure it exists and fetch its price
@@ -28,8 +28,8 @@ export const addFoodToCart = async (req, res) => {
         //add the foos  to the cart
         cart.foods.push({
             foodId,
-            price: food.price,
-        });
+            price: food.price
+        })
 
         //Recalculate the total price
         cart.calculateTotalPrice();
@@ -46,7 +46,7 @@ export const addFoodToCart = async (req, res) => {
 
 export const getCart = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user;
 
         const cart = await Cart.findOne({ userId }).populate("foods.foodId");
         if(!cart){
@@ -60,9 +60,9 @@ export const getCart = async (req, res) => {
     }
 }
 
-export const removeFoodFromCart = async (erq,res) => {
+export const removeFoodFromCart = async (req,res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user;
         const { foodId } = req.body
 
         //find the suer's cart
@@ -80,7 +80,27 @@ export const removeFoodFromCart = async (erq,res) => {
         //save the cart
         await cart.save();
 
-        res.status(200).json({data: cart, message: "course remove from cart"})
+        res.status(200).json({data: cart, message: "food remove from cart"})
+    } catch (error) {
+        console.log(error);
+        res.status(error.status || 500).json({ error: error.message || "Internal server error" });
+    }
+}
+
+export const clearCart = async (req, res)=>{
+    try {
+         const userId = req.user;
+
+         const cart  = await Cart.findOne({ userId })
+
+         if(!cart){
+            return res.status(404).json({ message: "cart not found " })
+         }
+         cart.foods = []
+         cart.calculateTotalPrice(0);
+         await cart.save()
+         return res.status(200).json({ message: "cart cleared" })
+
     } catch (error) {
         console.log(error);
         res.status(error.status || 500).json({ error: error.message || "Internal server error" });
